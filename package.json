@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "emcc lib/main.c -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']\"  -o public/demo.js",
-    "build:prod": "emcc lib/main.c -O3 -s EXPORTED_FUNCTIONS=\"['_ijk']\" -o public/demo.js",
+    "build": "emcc lib/main.c -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']\" -s EXPORTED_FUNCTIONS=\"['_malloc']\" -s ALLOW_MEMORY_GROWTH=1 -O3 -o public/demo.js",
     "test": "node tests"
   },
   "keywords": [],

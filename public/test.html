@@ -13,18 +13,63 @@
 </body>
 <script src="./demo.js"></script>
 <script>
+    function ijk(matrixA, matrixB, matrixC, length) {
+        for (let i = 0; i < length; i++) {
+            for (let j = 0; j < length; j++) {
+                for (let k = 0; k < length; k++) {
+                    matrixC[i * length + j] += (matrixA[i * length + k] * matrixB[j * length + k]);
+                }
+            }
+        }
+    }
     Module.onRuntimeInitialized = () => {
-        const LENGTH = 2;
-        const a1 = generateArray(LENGTH)
-        const a2 = generateArray(LENGTH)
-        const a3 = new Array(LENGTH ** 2).fill(0);
+        const LENGTH = 1000;
+        const IT = 10;
 
-        const matrix1 = generateMemoryArray(a1);
-        const matrix2 = generateMemoryArray(a2);
-        const matrix3 = generateMemoryArray(a3);
+        let arr = generateMatrixes();
 
-        _ijk(matrix1, matrix2, matrix3, LENGTH);
-        printArrayFromMemory(matrix3, 'i32', 2, LENGTH);
+        let js = [];
+        for (let i = 0; i < IT; i++) {
+            const { a1, a2, a3, matrix1, matrix2, matrix3 } = arr[i];
+            let copy = Array.from(a3);
+            let p1 = performance.now();
+            ijk(a1, a2, copy, LENGTH);
+            js.push(performance.now() - p1);
+        }
+
+        let c = [];
+        for (let i = 0; i < IT; i++) {
+            const { a1, a2, a3, matrix1, matrix2, matrix3 } = arr[i];
+            let copy = Array.from(a3);
+            let p1 = performance.now();
+            _ijk(a1, a2, copy, LENGTH);
+            c.push(performance.now() - p1);
+        }
+
+        for (let i = 0; i < IT; i++) {
+            console.log(`JS: ${js[i]} | C: ${c[i]}`)
+        }
+        // printArrayFromMemory(matrix3, 'i32', 2, LENGTH);
+        // console.log(copy)
+    }
+
+    function generateMatrixes() {
+        let arr = [];
+        for (let i = 0; i < IT; i++) {
+            const a1 = generateArray(LENGTH)
+            const a2 = generateArray(LENGTH)
+            const a3 = new Array(LENGTH ** 2).fill(0);
+
+            const matrix1 = generateMemoryArray(a1);
+            const matrix2 = generateMemoryArray(a2);
+            const matrix3 = generateMemoryArray(a3);
+
+            arr.push({
+                a1, a2, a3, matrix1, matrix2, matrix3
+            });
+        }
+
+        return arr;
     }
 
     function generateArray(length) {
@@ -53,8 +98,8 @@
             let val = Module.getValue(address + (i * 4), type);
             arr.push(val)
         }
-        https://stackoverflow.com/questions/28130095/how-to-use-c-allocated-array-in-emscripten-generated-code
-        console.log("FUNCIONA ", arr);
+        // https://stackoverflow.com/questions/28130095/how-to-use-c-allocated-array-in-emscripten-generated-code
+        console.log(arr);
     }
 </script>
 
