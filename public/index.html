@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    Web Assembly
+</body>
+<script src="demo.js"></script>
+<script>
+    function transferToHeap(arr) {
+        const floatArray = toFloatArr(arr);
+        let heapSpace = Module._malloc(floatArray.length *
+            floatArray.BYTES_PER_ELEMENT); // 1
+        Module.HEAPF32.set(floatArray, heapSpace >> 2); // 2 
+        return heapSpace;
+
+        function toFloatArr(arr) {
+            const res = new Float32Array(arr.length); // 3 
+            for (let i = 0; i < arr.length; i++)
+                res[i] = arr[i];
+            return res;
+        }
+    }
+    function sumUp(arr) {
+        let arrayOnHeap; // 4.
+        try {
+            arrayOnHeap = transferToHeap(arr);
+            let val = _sum_up(arrayOnHeap, arr.length);
+            console.log(Module.getValue(arrayOnHeap, 'float'));
+            return val;
+        } finally {
+            Module._free(arrayOnHeap); // 5.
+        }
+    }
+
+    Module['onRuntimeInitialized'] = () => {
+        // const LENGTH = 8;
+        // let a = new ArrayBuffer(LENGTH * LENGTH * 8);
+        // let ma = new Float64Array(a);
+
+        // const fill = cwrap('printArr', null, ['number', 'number']);
+        // let buffer = Module._malloc(LENGTH * 8);
+        // initialize(ma, LENGTH);
+        // console.log(ma);
+        // _printArr(ma, LENGTH);
+
+        let myarr = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
+        let a = sumUp(myarr)
+        console.log(a, myarr);
+
+        // var ptr = Module._malloc(8);
+        // var view = Module.HEAPU8.subarray(ptr, ptr + 8);
+
+        // for (let i = 0; i < view.length; i++) {
+        //     view[i] = (Math.floor(Math.random() * (1001 - 1)) + 1001);;
+        // }
+        // console.log(view);
+        // var f = cwrap("printArr", "undefined", ["number", "number"]);
+        // f(view, 8);
+    }
+    function initialize(matrix, length) {
+        for (let i = 0; i < length; i++) {
+            for (let j = 0; j < length; j++) {
+                matrix[i * length + j] = (Math.floor(Math.random() * (1001 - 1)) + 1001);
+            }
+        }
+    }
+
+</script>
+
+</html>

@@ -1,0 +1,61 @@
+<!-- https://medium.com/@tdeniffel/c-to-webassembly-pass-and-arrays-to-c-86e0cb0464f5 -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <p>Hello World</p>
+</body>
+<script src="./demo.js"></script>
+<script>
+    Module.onRuntimeInitialized = () => {
+        const LENGTH = 2;
+        const a1 = generateArray(LENGTH)
+        const a2 = generateArray(LENGTH)
+        const a3 = new Array(LENGTH ** 2).fill(0);
+
+        const matrix1 = generateMemoryArray(a1);
+        const matrix2 = generateMemoryArray(a2);
+        const matrix3 = generateMemoryArray(a3);
+
+        _ijk(matrix1, matrix2, matrix3, LENGTH);
+        printArrayFromMemory(matrix3, 'i32', 2, LENGTH);
+    }
+
+    function generateArray(length) {
+        let arr = [];
+        for (let i = 0; i < length ** 2; i++) {
+            arr.push(generateRandomNumber(100, 1000))
+        }
+        return arr;
+    }
+
+    function generateRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min) + min)
+    }
+
+    function generateMemoryArray(arr) {
+        const typed_arr = Int32Array.from(arr);
+        const pointer = Module._malloc(typed_arr.length * typed_arr.BYTES_PER_ELEMENT);
+        //https://github.com/emscripten-core/emscripten/issues/4003
+        Module.HEAP32.set(typed_arr, pointer >> 2);
+        return pointer;
+    }
+
+    function printArrayFromMemory(address, type, offset, length) {
+        let arr = [];
+        for (let i = 0; i < length ** length; i++) {
+            let val = Module.getValue(address + (i * 4), type);
+            arr.push(val)
+        }
+        https://stackoverflow.com/questions/28130095/how-to-use-c-allocated-array-in-emscripten-generated-code
+        console.log("FUNCIONA ", arr);
+    }
+</script>
+
+</html>

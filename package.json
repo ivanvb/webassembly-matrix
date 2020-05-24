@@ -1,0 +1,21 @@
+{
+  "name": "webassembly",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "emcc lib/main.c -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']\"  -o public/demo.js",
+    "build:prod": "emcc lib/main.c -O3 -s EXPORTED_FUNCTIONS=\"['_ijk']\" -o public/demo.js",
+    "test": "node tests"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@assemblyscript/loader": "^0.10.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "assemblyscript": "^0.10.0"
+  }
+}
